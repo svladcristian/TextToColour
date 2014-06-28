@@ -19,7 +19,7 @@
 			<applet_ref/>
 			<debugger_ref/>
 			<param/>
-			<run/>
+			<run>TextToColour</run>
 			<verify>true</verify>
 		</runtime>
 	</runtimes>

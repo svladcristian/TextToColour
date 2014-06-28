@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workspace>
+	<settings>
+		<label>TextToColour</label>
+	</settings>
+	<users>
+		<user>
+			<path>TextToColour.jcu</path>
+		</user>
+	</users>
+	<projects>
+		<project>
+			<path>TextToColour.jcp</path>
+		</project>
+	</projects>
+</workspace>

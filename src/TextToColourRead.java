@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
-public class TextToColour {
+public class TextToColourRead {
 	
     public static void main(String[] args) {
     	
-    	String FILENAME = "data.txt";
+    	String FILENAME = "data.in";
     	String text = new String();
     	try {
     		Scanner scanner = new Scanner(new File(FILENAME));
@@ -63,14 +63,14 @@ public class TextToColour {
 		 *
 		 * Creating image
 		 */
-		BufferedImage img = new BufferedImage(ni, nj, BufferedImage.TYPE_INT_RGB);
+		BufferedImage img = new BufferedImage(nj, ni, BufferedImage.TYPE_INT_RGB);
 		int np = 0;
 		int i;
 		for (i = 0; i+3 < m; i += 3) {
 			int red = (int) text.charAt(i);
 			int green = (int) text.charAt(i+1);
 			int blue = (int) text.charAt(i+2);
-			img.setRGB(np/nj, np%nj, ((red << 16) | (green << 8) | blue));
+			img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));
 			np++;
 		}
 		if (m - i > 0) {
@@ -83,7 +83,7 @@ public class TextToColour {
 				green = 0;
 			}
 			int blue = 0;
-			img.setRGB(np/nj, np%nj, ((red << 16) | (green << 8) | blue));
+			img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));
 			np++;
 		}
 		System.out.println("Number of pixels obtained: " + np + " - " + "Number of pixels expected: " + roundm);
@@ -96,14 +96,13 @@ public class TextToColour {
 			int red = 0;
 			int green = 0;
 			int blue = 0;
-			img.setRGB(np/nj, np%nj, ((red << 16) | (green << 8) | blue));
+			img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));
 			np++;
 		}
 		System.out.println("Number of pixels obtained: " + np + " - " + "Number of pixels expected: " + n);
-		
-		File f = new File("Image.png");
+
 		try {
-			ImageIO.write(img, "PNG", f);
+			ImageIO.write(img, "PNG", new File("image.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

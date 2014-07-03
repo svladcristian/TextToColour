@@ -1,1 +1,2 @@
-"C:\\Users\\Vlad\\Documents\\JCreator Pro\\MyProjects\\TextToColour\\src\\TextToColour.java"
+"C:\\Users\\Vlad\\Documents\\JCreator Pro\\MyProjects\\TextToColour\\src\\TextToColourRead.java"
+"C:\\Users\\Vlad\\Documents\\JCreator Pro\\MyProjects\\TextToColour\\src\\TextToColourWrite.java"

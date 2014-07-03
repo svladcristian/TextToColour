@@ -30,7 +30,11 @@
 				<path>src</path>
 			</folderitem>
 			<fileitem>
-				<path>src\TextToColour.java</path>
+				<path>src\TextToColourRead.java</path>
+				<folder>src</folder>
+			</fileitem>
+			<fileitem>
+				<path>src\TextToColourWrite.java</path>
 				<folder>src</folder>
 			</fileitem>
 		</include>

@@ -31,10 +31,11 @@ public class TextToColourRead {
 		else n = m/3 + 1;
 		int roundm = n;
 		System.out.println("m=" + m);
-		System.out.println("round m/3=" + roundm);
-
-		int THRESHOLD = 5;
-		int sizeThreshold = THRESHOLD % n;
+		System.out.println("initial n=round m/3=" + roundm);
+		
+		// TO DO: proper dynamic threshold
+		int THRESHOLD = 2;
+		int sizeThreshold = n / THRESHOLD;
 		int ni = 1, nj = 1, minDiff = n;
 		for (int i = 0; i < sizeThreshold; i++) {
 			int tempi = 1, tempj = 0, k = 1;
@@ -66,11 +67,42 @@ public class TextToColourRead {
 		BufferedImage img = new BufferedImage(nj, ni, BufferedImage.TYPE_INT_RGB);
 		int np = 0;
 		int i;
-		for (i = 0; i+3 < m; i += 3) {
+		// permutations: rgb rbg grb gbr brg bgr
+		int perm = 0;
+		for (i = 0; i+3 <= m; i += 3) {
 			int red = (int) text.charAt(i);
 			int green = (int) text.charAt(i+1);
 			int blue = (int) text.charAt(i+2);
-			img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));
+			System.out.print("[ " + red + " " + green + " " + blue + " ] ");
+			switch (perm) {
+				case 0: {
+					img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));
+					perm++;
+				}break;
+				case 1: {
+					img.setRGB(np/ni, np%ni, ((red << 16) | (blue << 8) | green));
+					perm++;
+				}break;
+				case 2: {
+					img.setRGB(np/ni, np%ni, ((green << 16) | (red << 8) | blue));
+					perm++;
+				}break;
+				case 3: {
+					img.setRGB(np/ni, np%ni, ((green << 16) | (blue << 8) | red));
+					perm++;
+				}break;
+				case 4: {
+					img.setRGB(np/ni, np%ni, ((blue << 16) | (red << 8) | green));
+					perm++;
+				}break;
+				case 5: {
+					img.setRGB(np/ni, np%ni, ((blue << 16) | (green << 8) | red));
+					perm = 0;
+				}break;
+				default: {
+					img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));	
+				}break;
+			}
 			np++;
 		}
 		if (m - i > 0) {
@@ -83,9 +115,39 @@ public class TextToColourRead {
 				green = 0;
 			}
 			int blue = 0;
-			img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));
+			System.out.println("*[ " + red + " " + green + " " + blue + " ]* ");
+			switch (perm) {
+				case 0: {
+					img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));
+					perm++;
+				}break;
+				case 1: {
+					img.setRGB(np/ni, np%ni, ((red << 16) | (blue << 8) | green));
+					perm++;
+				}break;
+				case 2: {
+					img.setRGB(np/ni, np%ni, ((green << 16) | (red << 8) | blue));
+					perm++;
+				}break;
+				case 3: {
+					img.setRGB(np/ni, np%ni, ((green << 16) | (blue << 8) | red));
+					perm++;
+				}break;
+				case 4: {
+					img.setRGB(np/ni, np%ni, ((blue << 16) | (red << 8) | green));
+					perm++;
+				}break;
+				case 5: {
+					img.setRGB(np/ni, np%ni, ((blue << 16) | (green << 8) | red));
+					perm = 0;
+				}break;
+				default: {
+					img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));	
+				}break;
+			}
 			np++;
 		}
+		System.out.println();
 		System.out.println("Number of pixels obtained: " + np + " - " + "Number of pixels expected: " + roundm);
 		
 		/*
@@ -96,9 +158,39 @@ public class TextToColourRead {
 			int red = 0;
 			int green = 0;
 			int blue = 0;
-			img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));
+			System.out.print("**[ " + red + " " + green + " " + blue + " ]** ");
+			switch (perm) {
+				case 0: {
+					img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));
+					perm++;
+				}break;
+				case 1: {
+					img.setRGB(np/ni, np%ni, ((red << 16) | (blue << 8) | green));
+					perm++;
+				}break;
+				case 2: {
+					img.setRGB(np/ni, np%ni, ((green << 16) | (red << 8) | blue));
+					perm++;
+				}break;
+				case 3: {
+					img.setRGB(np/ni, np%ni, ((green << 16) | (blue << 8) | red));
+					perm++;
+				}break;
+				case 4: {
+					img.setRGB(np/ni, np%ni, ((blue << 16) | (red << 8) | green));
+					perm++;
+				}break;
+				case 5: {
+					img.setRGB(np/ni, np%ni, ((blue << 16) | (green << 8) | red));
+					perm = 0;
+				}break;
+				default: {
+					img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));	
+				}break;
+			}
 			np++;
 		}
+		System.out.println();
 		System.out.println("Number of pixels obtained: " + np + " - " + "Number of pixels expected: " + n);
 
 		try {

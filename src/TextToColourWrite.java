@@ -21,13 +21,45 @@ public class TextToColourWrite {
 		System.out.println(ni + "*" + nj);
 		
 		StringBuilder stringBuilder = new StringBuilder();
+		// permutations: rgb rbg grb gbr brg bgr
+		int perm = 0;
 		for (int i = 0; i < nj; i++) {
 			for (int j = 0; j < ni; j++) {
 				int rgb = img.getRGB(i, j);
 				int red = (rgb >> 16) & 0xFF;
 				int green = (rgb >>8 ) & 0xFF;
 				int blue = (rgb) & 0xFF;
-				stringBuilder.append(Character.toString ((char) red) + Character.toString ((char) green) + Character.toString ((char) blue));
+				System.out.print("[ " + red + " " + green + " " + blue + " ] ");
+				System.out.println(Character.toString ((char) red) + Character.toString ((char) green) + Character.toString ((char) blue));
+				switch (perm) {
+					case 0: {
+						stringBuilder.append(Character.toString ((char) red) + Character.toString ((char) green) + Character.toString ((char) blue));
+						perm++;
+					}break;
+					case 1: {
+						stringBuilder.append(Character.toString ((char) red) + Character.toString ((char) blue) + Character.toString ((char) green));
+						perm++;
+					}break;
+					case 2: {
+						stringBuilder.append(Character.toString ((char) green) + Character.toString ((char) red) + Character.toString ((char) blue));
+						perm++;
+					}break;
+					case 3: {
+						stringBuilder.append(Character.toString ((char) blue) + Character.toString ((char) red) + Character.toString ((char) green));
+						perm++;
+					}break;
+					case 4: {
+						stringBuilder.append(Character.toString ((char) green) + Character.toString ((char) blue) + Character.toString ((char) red));
+						perm++;
+					}break;
+					case 5: {
+						stringBuilder.append(Character.toString ((char) blue) + Character.toString ((char) green) + Character.toString ((char) red));
+						perm = 0;
+					}break;
+					default: {
+						stringBuilder.append(Character.toString ((char) red) + Character.toString ((char) green) + Character.toString ((char) blue));
+					}break;
+				}
 			}
 		}
 		String text;

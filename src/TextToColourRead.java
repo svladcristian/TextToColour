@@ -32,10 +32,9 @@ public class TextToColourRead {
 		int roundm = n;
 		System.out.println("m=" + m);
 		System.out.println("initial n=round m/3=" + roundm);
-		
-		// TO DO: proper dynamic threshold
-		int THRESHOLD = 2;
-		int sizeThreshold = n / THRESHOLD;
+
+		int THRESHOLD = 5;
+		int sizeThreshold = (((THRESHOLD / 100) * n ) < 1) ? 1 : (THRESHOLD / 100) * n;
 		int ni = 1, nj = 1, minDiff = n;
 		for (int i = 0; i < sizeThreshold; i++) {
 			int tempi = 1, tempj = 0, k = 1;

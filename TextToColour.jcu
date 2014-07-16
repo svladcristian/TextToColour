@@ -18,12 +18,18 @@
 			<path>src\TextToColourRead.java</path>
 			<source>true</source>
 			<index>0</index>
-			<active>true</active>
+			<active>false</active>
 		</docitem>
 		<docitem>
 			<path>src\TextToColourWrite.java</path>
 			<source>true</source>
 			<index>1</index>
+			<active>true</active>
+		</docitem>
+		<docitem>
+			<path>src\charMap.java</path>
+			<source>true</source>
+			<index>2</index>
 			<active>false</active>
 		</docitem>
 	</open_files>

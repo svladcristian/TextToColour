@@ -1,5 +1,7 @@
 import java.util.Scanner;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.awt.image.BufferedImage;
@@ -12,10 +14,10 @@ public class TextToColourRead {
     public static void main(String[] args) {
     	
 		// Reading text from file.
-    	String FILENAME = "data.in";
-    	String text = new String();
+		String text = new String();
     	try {
-    		Scanner scanner = new Scanner(new File(FILENAME));
+    		String INPUTFILENAME = "data.in";
+    		Scanner scanner = new Scanner(new File(INPUTFILENAME));
     		StringBuilder stringBuilder = new StringBuilder();
     		stringBuilder.append(scanner.nextLine());
     		String newLine = System.getProperty("line.separator");
@@ -37,6 +39,18 @@ public class TextToColourRead {
 		}
 		Collections.shuffle(allChars);
 		System.out.println(allChars.size() + " - " + allChars);
+		
+		try {
+			charMap cm = new charMap(allChars);
+			String CHARMAPFILENAME = "charmap.ser";
+			FileOutputStream fos = new FileOutputStream("charmap.ser");
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(cm);
+			oos.close();
+			fos.close();
+		}catch(IOException e) {
+			e.printStackTrace();
+		}
 		
 		/*
 		 // Determining the size the resulting image.

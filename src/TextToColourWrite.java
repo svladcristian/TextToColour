@@ -1,8 +1,11 @@
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import java.util.ArrayList;
 
 public class TextToColourWrite {
 
@@ -20,6 +23,23 @@ public class TextToColourWrite {
 		nj = img.getWidth();
 		System.out.println(ni + "*" + nj);
 		
+		charMap cm = null;
+		try {
+			String CHARMAPFILENAME = "charmap.ser";
+			FileInputStream fis = new FileInputStream(CHARMAPFILENAME);
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			cm = (charMap) ois.readObject();
+			ois.close();
+			fis.close();
+		}catch(IOException e) {
+			e.printStackTrace();
+		}catch(ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		ArrayList<Character> allChars = new ArrayList<Character>(cm.chars);
+		System.out.println(allChars.size() + " - " + allChars);
+		
+		/*
 		StringBuilder stringBuilder = new StringBuilder();
 		// permutations: rgb rbg grb gbr brg bgr
 		int perm = 0;
@@ -74,6 +94,6 @@ public class TextToColourWrite {
       	}catch(IOException e) {
       		e.printStackTrace();
       	}
-		
+		*/
     }
 }

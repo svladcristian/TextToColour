@@ -30,6 +30,10 @@
 				<path>src</path>
 			</folderitem>
 			<fileitem>
+				<path>src\charMap.java</path>
+				<folder>src</folder>
+			</fileitem>
+			<fileitem>
 				<path>src\TextToColourRead.java</path>
 				<folder>src</folder>
 			</fileitem>

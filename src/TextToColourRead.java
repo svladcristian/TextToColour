@@ -4,11 +4,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class TextToColourRead {
 	
     public static void main(String[] args) {
     	
+		// Reading text from file.
     	String FILENAME = "data.in";
     	String text = new String();
     	try {
@@ -24,7 +27,19 @@ public class TextToColourRead {
     		ex.printStackTrace();
     	}
     	System.out.println(text);
-
+    	
+		// Creating character mapping.
+		ArrayList<Character> allChars = new ArrayList<Character>();
+		for (int i = 0; i < text.length(); i++) {
+			if (allChars.contains(text.charAt(i)) == false) {
+				allChars.add(text.charAt(i));
+			}
+		}
+		Collections.shuffle(allChars);
+		System.out.println(allChars.size() + " - " + allChars);
+		
+		/*
+		 // Determining the size the resulting image.
 		int m = text.length();
 		int n;
 		if (m%3 == 0) n = m/3;
@@ -32,7 +47,8 @@ public class TextToColourRead {
 		int roundm = n;
 		System.out.println("m=" + m);
 		System.out.println("initial n=round m/3=" + roundm);
-
+		
+		// Determining the optimal dimensions the resulting image.
 		int THRESHOLD = 5;
 		int sizeThreshold = (((THRESHOLD / 100) * n ) < 1) ? 1 : (THRESHOLD / 100) * n;
 		int ni = 1, nj = 1, minDiff = n;
@@ -55,14 +71,11 @@ public class TextToColourRead {
 		}
 		n = ni*nj;
 		System.out.println("n=" + n + "=" + ni + "*" + nj);
-	
-		/*
-		 * Determining pixel values, obtained strictly from text characters,
-		 * with at most 2 rgb value fillers, to complete the last pixel.
-		 * - roundm reached
-		 *
-		 * Creating image
-		 */
+		
+		// Determining pixel values, obtained strictly from text characters,
+		// with at most 2 rgb value fillers, to complete the last pixel.
+		// - roundm reached
+		// Creating image
 		BufferedImage img = new BufferedImage(nj, ni, BufferedImage.TYPE_INT_RGB);
 		int np = 0;
 		int i;
@@ -148,11 +161,9 @@ public class TextToColourRead {
 		}
 		System.out.println();
 		System.out.println("Number of pixels obtained: " + np + " - " + "Number of pixels expected: " + roundm);
-		
-		/*
-		 * Filling remaining pixels to completion.
-		 * - n reached
-		 */
+			
+		// Filling remaining pixels to completion.
+		// - n reached
 		for (i = roundm; i < n; i++) {
 			int red = 0;
 			int green = 0;
@@ -191,12 +202,13 @@ public class TextToColourRead {
 		}
 		System.out.println();
 		System.out.println("Number of pixels obtained: " + np + " - " + "Number of pixels expected: " + n);
-
+		
+		// Writing resulting image.
 		try {
 			ImageIO.write(img, "PNG", new File("image.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		*/
     }
 }

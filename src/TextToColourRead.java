@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 public class TextToColourRead {
 	
@@ -37,8 +38,10 @@ public class TextToColourRead {
 				allChars.add(text.charAt(i));
 			}
 		}
+		allChars.add('0');
 		Collections.shuffle(allChars);
 		System.out.println(allChars.size() + " - " + allChars);
+		int intervalSpan = 256 / allChars.size(); 
 		
 		try {
 			charMap cm = new charMap(allChars);
@@ -51,8 +54,7 @@ public class TextToColourRead {
 		}catch(IOException e) {
 			e.printStackTrace();
 		}
-		
-		/*
+
 		 // Determining the size the resulting image.
 		int m = text.length();
 		int n;
@@ -95,10 +97,29 @@ public class TextToColourRead {
 		int i;
 		// permutations: rgb rbg grb gbr brg bgr
 		int perm = 0;
+		Random rand = new Random();
+		int range, randNum;
 		for (i = 0; i+3 <= m; i += 3) {
-			int red = (int) text.charAt(i);
-			int green = (int) text.charAt(i+1);
-			int blue = (int) text.charAt(i+2);
+			// int red = (int) text.charAt(i);
+			// int green = (int) text.charAt(i+1);
+			// int blue = (int) text.charAt(i+2);
+			
+			// character mapping
+			int red = allChars.indexOf(text.charAt(i));
+			range = ((((red + 1) *intervalSpan) - 1) - (red *intervalSpan))  + 1;
+			randNum =  rand.nextInt(range) + (red *intervalSpan);
+			red = randNum;
+			
+			int green = allChars.indexOf(text.charAt(i+1));
+			range = (((green + 1) *intervalSpan) - 1) - (green *intervalSpan)  + 1;
+			randNum =  rand.nextInt(range) + (green *intervalSpan);
+			green = randNum;
+			
+			int blue = allChars.indexOf(text.charAt(i+2));
+			range = (((blue + 1) *intervalSpan) - 1) - (blue *intervalSpan)  + 1;
+			randNum =  rand.nextInt(range) + (blue *intervalSpan);
+			blue = randNum;
+			
 			System.out.print("[ " + red + " " + green + " " + blue + " ] ");
 			switch (perm) {
 				case 0: {
@@ -132,15 +153,29 @@ public class TextToColourRead {
 			np++;
 		}
 		if (m - i > 0) {
-			int red = (int) text.charAt(i);
+			//int red = (int) text.charAt(i);
+			int red = allChars.indexOf(text.charAt(i));
+			range = (((red + 1) *intervalSpan) - 1) - (red *intervalSpan)  + 1;
+			randNum =  rand.nextInt(range) + (red *intervalSpan);
+			red = randNum;
+			
 			int green;
 			if (m - i > 1) {
-				green = (int) text.charAt(i+1);
+				green = allChars.indexOf(text.charAt(i+1));
+				range = (((green + 1) *intervalSpan) - 1) - (green *intervalSpan)  + 1;
+				randNum =  rand.nextInt(range) + (green *intervalSpan);
+				green = randNum;
 			}
 			else {
-				green = 0;
+				green = allChars.indexOf('0');
+				range = ((((green + 1) *intervalSpan) - 1) - (green *intervalSpan))  + 1;
+				randNum =  rand.nextInt(range) + (green *intervalSpan);
+				green = randNum;
 			}
-			int blue = 0;
+			int blue = allChars.indexOf('0');
+			range = ((((blue + 1) *intervalSpan) - 1) - (blue *intervalSpan))  + 1;
+			randNum =  rand.nextInt(range) + (blue *intervalSpan);
+			blue = randNum;
 			System.out.println("*[ " + red + " " + green + " " + blue + " ]* ");
 			switch (perm) {
 				case 0: {
@@ -179,9 +214,21 @@ public class TextToColourRead {
 		// Filling remaining pixels to completion.
 		// - n reached
 		for (i = roundm; i < n; i++) {
-			int red = 0;
-			int green = 0;
-			int blue = 0;
+			int red = allChars.indexOf('0');
+			range = ((((red + 1) *intervalSpan) - 1) - (red *intervalSpan))  + 1;
+			randNum =  rand.nextInt(range) + (red *intervalSpan);
+			red = randNum;
+			
+			int green = allChars.indexOf('0');
+			range = ((((green + 1) *intervalSpan) - 1) - (green *intervalSpan))  + 1;
+			randNum =  rand.nextInt(range) + (green *intervalSpan);
+			green = randNum;
+			
+			int blue = allChars.indexOf('0');
+			range = ((((blue + 1) *intervalSpan) - 1) - (blue *intervalSpan))  + 1;
+			randNum =  rand.nextInt(range) + (blue *intervalSpan);
+			blue = randNum;
+			
 			System.out.print("**[ " + red + " " + green + " " + blue + " ]** ");
 			switch (perm) {
 				case 0: {
@@ -223,6 +270,6 @@ public class TextToColourRead {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		*/
+	
     }
 }

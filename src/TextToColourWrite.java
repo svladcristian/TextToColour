@@ -11,6 +11,7 @@ public class TextToColourWrite {
 
     public static void main(String[] args) {
     	
+    	// Open image file
     	BufferedImage img = null;
 		try {
     		img = ImageIO.read(new File("image.png"));
@@ -18,11 +19,13 @@ public class TextToColourWrite {
 				e.printStackTrace();
 		}
 		
+		// Determine image dimensions
 		int ni, nj;
 		ni = img.getHeight();
 		nj = img.getWidth();
 		System.out.println(ni + "*" + nj);
 		
+		// Open & read charmap file
 		charMap cm = null;
 		try {
 			String CHARMAPFILENAME = "charmap.ser";
@@ -37,9 +40,10 @@ public class TextToColourWrite {
 			e.printStackTrace();
 		}
 		ArrayList<Character> allChars = new ArrayList<Character>(cm.chars);
-		System.out.println(allChars.size() + " - " + allChars);
+		System.out.println("Charmap size=" + allChars.size());
+		int numberOfIntervals = 256 / allChars.size(); 
 		
-		/*
+		// Read & decode image data
 		StringBuilder stringBuilder = new StringBuilder();
 		// permutations: rgb rbg grb gbr brg bgr
 		int perm = 0;
@@ -50,34 +54,57 @@ public class TextToColourWrite {
 				int green = (rgb >>8 ) & 0xFF;
 				int blue = (rgb) & 0xFF;
 				System.out.print("[ " + red + " " + green + " " + blue + " ] ");
-				System.out.println(Character.toString ((char) red) + Character.toString ((char) green) + Character.toString ((char) blue));
+				
+				red = red / numberOfIntervals;
+				green = green / numberOfIntervals;
+				blue = blue / numberOfIntervals;
+				
+				System.out.print("[ " + red + " " + green + " " + blue + " ] ");
+				System.out.print(allChars.get(red));
+				System.out.print(allChars.get(green));
+				System.out.print(allChars.get(blue));
+				System.out.println();
 				switch (perm) {
 					case 0: {
-						stringBuilder.append(Character.toString ((char) red) + Character.toString ((char) green) + Character.toString ((char) blue));
+						stringBuilder.append(allChars.get(red));
+						stringBuilder.append(allChars.get(green));
+						stringBuilder.append(allChars.get(blue));
 						perm++;
 					}break;
 					case 1: {
-						stringBuilder.append(Character.toString ((char) red) + Character.toString ((char) blue) + Character.toString ((char) green));
+						stringBuilder.append(allChars.get(red));
+						stringBuilder.append(allChars.get(blue));
+						stringBuilder.append(allChars.get(green));
 						perm++;
 					}break;
 					case 2: {
-						stringBuilder.append(Character.toString ((char) green) + Character.toString ((char) red) + Character.toString ((char) blue));
+						stringBuilder.append(allChars.get(green));
+						stringBuilder.append(allChars.get(red));
+						stringBuilder.append(allChars.get(blue));
 						perm++;
 					}break;
 					case 3: {
-						stringBuilder.append(Character.toString ((char) blue) + Character.toString ((char) red) + Character.toString ((char) green));
+						stringBuilder.append(allChars.get(blue));
+						stringBuilder.append(allChars.get(red));
+						stringBuilder.append(allChars.get(green));
 						perm++;
 					}break;
 					case 4: {
-						stringBuilder.append(Character.toString ((char) green) + Character.toString ((char) blue) + Character.toString ((char) red));
+						stringBuilder.append(allChars.get(green));
+						stringBuilder.append(allChars.get(blue));
+						stringBuilder.append(allChars.get(red));
 						perm++;
 					}break;
 					case 5: {
-						stringBuilder.append(Character.toString ((char) blue) + Character.toString ((char) green) + Character.toString ((char) red));
+						stringBuilder.append(allChars.get(blue));
+						stringBuilder.append(allChars.get(green));
+						stringBuilder.append(allChars.get(red));
 						perm = 0;
 					}break;
 					default: {
-						stringBuilder.append(Character.toString ((char) red) + Character.toString ((char) green) + Character.toString ((char) blue));
+						stringBuilder.append(allChars.get(red));
+						stringBuilder.append(allChars.get(green));
+						stringBuilder.append(allChars.get(blue));
 					}break;
 				}
 			}
@@ -87,6 +114,7 @@ public class TextToColourWrite {
 		text = text.trim();
 		System.out.println(text);
 		
+		// Write to file.
 		try {
 			FileWriter fw = new FileWriter(new File("data.out"));
             fw.write(text);
@@ -94,6 +122,5 @@ public class TextToColourWrite {
       	}catch(IOException e) {
       		e.printStackTrace();
       	}
-		*/
     }
 }

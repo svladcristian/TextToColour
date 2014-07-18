@@ -38,9 +38,9 @@ public class TextToColourRead {
 				allChars.add(text.charAt(i));
 			}
 		}
-		allChars.add('0');
+		allChars.add('\0');
 		Collections.shuffle(allChars);
-		System.out.println(allChars.size() + " - " + allChars);
+		System.out.println("Charmap size=" + allChars.size());
 		int intervalSpan = 256 / allChars.size(); 
 		
 		try {
@@ -65,10 +65,10 @@ public class TextToColourRead {
 		System.out.println("initial n=round m/3=" + roundm);
 		
 		// Determining the optimal dimensions the resulting image.
-		int THRESHOLD = 5;
-		int sizeThreshold = (((THRESHOLD / 100) * n ) < 1) ? 1 : (THRESHOLD / 100) * n;
+		double THRESHOLD_VALUE = 5;
+		double thresholdSize = (((THRESHOLD_VALUE / 100) * n ) < 1) ? 1 : (THRESHOLD_VALUE / 100) * n;
 		int ni = 1, nj = 1, minDiff = n;
-		for (int i = 0; i < sizeThreshold; i++) {
+		for (int i = 0; i < thresholdSize; i++) {
 			int tempi = 1, tempj = 0, k = 1;
 			do {
 				k++;
@@ -167,12 +167,12 @@ public class TextToColourRead {
 				green = randNum;
 			}
 			else {
-				green = allChars.indexOf('0');
+				green = allChars.indexOf('\0');
 				range = ((((green + 1) *intervalSpan) - 1) - (green *intervalSpan))  + 1;
 				randNum =  rand.nextInt(range) + (green *intervalSpan);
 				green = randNum;
 			}
-			int blue = allChars.indexOf('0');
+			int blue = allChars.indexOf('\0');
 			range = ((((blue + 1) *intervalSpan) - 1) - (blue *intervalSpan))  + 1;
 			randNum =  rand.nextInt(range) + (blue *intervalSpan);
 			blue = randNum;
@@ -214,17 +214,17 @@ public class TextToColourRead {
 		// Filling remaining pixels to completion.
 		// - n reached
 		for (i = roundm; i < n; i++) {
-			int red = allChars.indexOf('0');
+			int red = allChars.indexOf('\0');
 			range = ((((red + 1) *intervalSpan) - 1) - (red *intervalSpan))  + 1;
 			randNum =  rand.nextInt(range) + (red *intervalSpan);
 			red = randNum;
 			
-			int green = allChars.indexOf('0');
+			int green = allChars.indexOf('\0');
 			range = ((((green + 1) *intervalSpan) - 1) - (green *intervalSpan))  + 1;
 			randNum =  rand.nextInt(range) + (green *intervalSpan);
 			green = randNum;
 			
-			int blue = allChars.indexOf('0');
+			int blue = allChars.indexOf('\0');
 			range = ((((blue + 1) *intervalSpan) - 1) - (blue *intervalSpan))  + 1;
 			randNum =  rand.nextInt(range) + (blue *intervalSpan);
 			blue = randNum;

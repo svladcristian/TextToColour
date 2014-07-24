@@ -10,14 +10,38 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+class positionCoordinates {
+	int perm, pixelCount;
+	positionCoordinates(int p, int pc) {
+		perm = p;
+		pixelCount = pc;
+	}
+	int getPerm() {
+		return perm;
+	}
+	int getPixelCount() {
+		return pixelCount;
+	}
+	void resetPerm() {
+		perm = 0;
+		pixelCount++;
+	}
+	void increment() {
+		perm++;
+		pixelCount++;
+	}
+}
+
 public class TextToColourRead {
-	
-    public static void main(String[] args) {
-    	
+	String text;
+	ArrayList<Character> allChars;
+	int intervalSpan;
+	BufferedImage image;
+	int n, m, roundm, ni, nj;
+	public TextToColourRead(String INPUTFILENAME) {
 		// Reading text from file.
-		String text = new String();
+		text = new String();
     	try {
-    		String INPUTFILENAME = "data.in";
     		Scanner scanner = new Scanner(new File(INPUTFILENAME));
     		StringBuilder stringBuilder = new StringBuilder();
     		stringBuilder.append(scanner.nextLine());
@@ -31,8 +55,12 @@ public class TextToColourRead {
     	}
     	System.out.println(text);
     	
+    	mapCharacters();
+	}
+	
+	void mapCharacters() {
 		// Creating character mapping.
-		ArrayList<Character> allChars = new ArrayList<Character>();
+		allChars = new ArrayList<Character>();
 		for (int i = 0; i < text.length(); i++) {
 			if (allChars.contains(text.charAt(i)) == false) {
 				allChars.add(text.charAt(i));
@@ -41,12 +69,16 @@ public class TextToColourRead {
 		allChars.add('\0');
 		Collections.shuffle(allChars);
 		System.out.println("Charmap size=" + allChars.size());
-		int intervalSpan = 256 / allChars.size(); 
+		intervalSpan = 256 / allChars.size(); 
 		
+		String CHARMAPFILENAME = "charmap.ser";
+		writeCharMap(CHARMAPFILENAME);
+	}
+	
+	void writeCharMap(String CHARMAPFILENAME) {
 		try {
 			charMap cm = new charMap(allChars);
-			String CHARMAPFILENAME = "charmap.ser";
-			FileOutputStream fos = new FileOutputStream("charmap.ser");
+			FileOutputStream fos = new FileOutputStream(CHARMAPFILENAME);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 			oos.writeObject(cm);
 			oos.close();
@@ -54,20 +86,23 @@ public class TextToColourRead {
 		}catch(IOException e) {
 			e.printStackTrace();
 		}
-
-		 // Determining the size the resulting image.
-		int m = text.length();
-		int n;
+		
+		double THRESHOLDVALUE = 5;
+		determineDimensions(THRESHOLDVALUE);
+	}
+	
+	void determineDimensions(double THRESHOLDVALUE) {
+		// Determining the size the resulting image.
+		m = text.length();
 		if (m%3 == 0) n = m/3;
 		else n = m/3 + 1;
-		int roundm = n;
+		roundm = n;
 		System.out.println("m=" + m);
 		System.out.println("initial n=round m/3=" + roundm);
 		
 		// Determining the optimal dimensions the resulting image.
-		double THRESHOLD_VALUE = 5;
-		double thresholdSize = (((THRESHOLD_VALUE / 100) * n ) < 1) ? 1 : (THRESHOLD_VALUE / 100) * n;
-		int ni = 1, nj = 1, minDiff = n;
+		double thresholdSize = (((THRESHOLDVALUE / 100) * n ) < 1) ? 1 : (THRESHOLDVALUE / 100) * n;
+		ni = 1; nj = 1; int minDiff = n;
 		for (int i = 0; i < thresholdSize; i++) {
 			int tempi = 1, tempj = 0, k = 1;
 			do {
@@ -88,21 +123,25 @@ public class TextToColourRead {
 		n = ni*nj;
 		System.out.println("n=" + n + "=" + ni + "*" + nj);
 		
+		buildImage();
+	}
+	
+	void buildImage() {
 		// Determining pixel values, obtained strictly from text characters,
 		// with at most 2 rgb value fillers, to complete the last pixel.
 		// - roundm reached
 		// Creating image
-		BufferedImage img = new BufferedImage(nj, ni, BufferedImage.TYPE_INT_RGB);
-		int np = 0;
+		image = new BufferedImage(nj, ni, BufferedImage.TYPE_INT_RGB);
+		// int np = 0;
 		int i;
-		// permutations: rgb rbg grb gbr brg bgr
-		int perm = 0;
+		positionCoordinates pos = new positionCoordinates(0,0);
+		//intWrapper perm = new intWrapper(0);
 		Random rand = new Random();
 		int range, randNum;
 		for (i = 0; i+3 <= m; i += 3) {
-			// int red = (int) text.charAt(i);
-			// int green = (int) text.charAt(i+1);
-			// int blue = (int) text.charAt(i+2);
+			//int red = (int) text.charAt(i);
+			//int green = (int) text.charAt(i+1);
+			//int blue = (int) text.charAt(i+2);
 			
 			// character mapping
 			int red = allChars.indexOf(text.charAt(i));
@@ -121,36 +160,8 @@ public class TextToColourRead {
 			blue = randNum;
 			
 			System.out.print("[ " + red + " " + green + " " + blue + " ] ");
-			switch (perm) {
-				case 0: {
-					img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));
-					perm++;
-				}break;
-				case 1: {
-					img.setRGB(np/ni, np%ni, ((red << 16) | (blue << 8) | green));
-					perm++;
-				}break;
-				case 2: {
-					img.setRGB(np/ni, np%ni, ((green << 16) | (red << 8) | blue));
-					perm++;
-				}break;
-				case 3: {
-					img.setRGB(np/ni, np%ni, ((green << 16) | (blue << 8) | red));
-					perm++;
-				}break;
-				case 4: {
-					img.setRGB(np/ni, np%ni, ((blue << 16) | (red << 8) | green));
-					perm++;
-				}break;
-				case 5: {
-					img.setRGB(np/ni, np%ni, ((blue << 16) | (green << 8) | red));
-					perm = 0;
-				}break;
-				default: {
-					img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));	
-				}break;
-			}
-			np++;
+			setRGBPermute(pos, red, green, blue);
+			//np++;
 		}
 		if (m - i > 0) {
 			//int red = (int) text.charAt(i);
@@ -177,39 +188,11 @@ public class TextToColourRead {
 			randNum =  rand.nextInt(range) + (blue *intervalSpan);
 			blue = randNum;
 			System.out.println("*[ " + red + " " + green + " " + blue + " ]* ");
-			switch (perm) {
-				case 0: {
-					img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));
-					perm++;
-				}break;
-				case 1: {
-					img.setRGB(np/ni, np%ni, ((red << 16) | (blue << 8) | green));
-					perm++;
-				}break;
-				case 2: {
-					img.setRGB(np/ni, np%ni, ((green << 16) | (red << 8) | blue));
-					perm++;
-				}break;
-				case 3: {
-					img.setRGB(np/ni, np%ni, ((green << 16) | (blue << 8) | red));
-					perm++;
-				}break;
-				case 4: {
-					img.setRGB(np/ni, np%ni, ((blue << 16) | (red << 8) | green));
-					perm++;
-				}break;
-				case 5: {
-					img.setRGB(np/ni, np%ni, ((blue << 16) | (green << 8) | red));
-					perm = 0;
-				}break;
-				default: {
-					img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));	
-				}break;
-			}
-			np++;
+			setRGBPermute(pos, red, green, blue);
+			//np++;
 		}
 		System.out.println();
-		System.out.println("Number of pixels obtained: " + np + " - " + "Number of pixels expected: " + roundm);
+		System.out.println("Number of pixels obtained: " + pos.getPixelCount() + " - " + "Number of pixels expected: " + roundm);
 			
 		// Filling remaining pixels to completion.
 		// - n reached
@@ -230,46 +213,61 @@ public class TextToColourRead {
 			blue = randNum;
 			
 			System.out.print("**[ " + red + " " + green + " " + blue + " ]** ");
-			switch (perm) {
-				case 0: {
-					img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));
-					perm++;
-				}break;
-				case 1: {
-					img.setRGB(np/ni, np%ni, ((red << 16) | (blue << 8) | green));
-					perm++;
-				}break;
-				case 2: {
-					img.setRGB(np/ni, np%ni, ((green << 16) | (red << 8) | blue));
-					perm++;
-				}break;
-				case 3: {
-					img.setRGB(np/ni, np%ni, ((green << 16) | (blue << 8) | red));
-					perm++;
-				}break;
-				case 4: {
-					img.setRGB(np/ni, np%ni, ((blue << 16) | (red << 8) | green));
-					perm++;
-				}break;
-				case 5: {
-					img.setRGB(np/ni, np%ni, ((blue << 16) | (green << 8) | red));
-					perm = 0;
-				}break;
-				default: {
-					img.setRGB(np/ni, np%ni, ((red << 16) | (green << 8) | blue));	
-				}break;
-			}
-			np++;
+			setRGBPermute(pos, red, green, blue);
+			//np++;
 		}
 		System.out.println();
-		System.out.println("Number of pixels obtained: " + np + " - " + "Number of pixels expected: " + n);
+		System.out.println("Number of pixels obtained: " + pos.getPixelCount() + " - " + "Number of pixels expected: " + n);
 		
+		writeImage();
+	}
+	
+	void setRGBPermute(positionCoordinates pos, int red, int green, int blue) {
+		// permutations: rgb rbg grb gbr brg bgr
+		switch (pos.getPerm()) {
+			case 0: {
+				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((red << 16) | (green << 8) | blue));
+				pos.increment();
+			}break;
+			case 1: {
+				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((red << 16) | (blue << 8) | green));
+				pos.increment();
+			}break;
+			case 2: {
+				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((green << 16) | (red << 8) | blue));
+				pos.increment();
+			}break;
+			case 3: {
+				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((green << 16) | (blue << 8) | red));
+				pos.increment();
+			}break;
+			case 4: {
+				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((blue << 16) | (red << 8) | green));
+				pos.increment();
+			}break;
+			case 5: {
+				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((blue << 16) | (green << 8) | red));
+				pos.resetPerm();
+			}break;
+			default: {
+				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((red << 16) | (green << 8) | blue));	
+			}break;
+		}
+	}
+	
+	void writeImage() {
 		// Writing resulting image.
 		try {
-			ImageIO.write(img, "PNG", new File("image.png"));
+			ImageIO.write(image, "PNG", new File("image.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
 	
+    public static void main(String[] args) {
+    	
+    	String INPUTFILENAME = "data.in";
+    	TextToColourRead encode = new TextToColourRead(INPUTFILENAME);
+
     }
 }

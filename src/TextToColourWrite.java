@@ -113,6 +113,7 @@ public class TextToColourWrite {
 		text = stringBuilder.toString();
 		text = text.trim();
 		System.out.println(text);
+		System.out.println("size of text = " + text.length());
 		
 		// Write to file.
 		try {

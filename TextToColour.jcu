@@ -11,6 +11,10 @@
 			<folderitem>
 				<path>src</path>
 			</folderitem>
+			<fileitem>
+				<path>src\TextToColourRead.java</path>
+				<collapsedfolds>183;167;150;130;0</collapsedfolds>
+			</fileitem>
 		</project>
 	</projects>
 	<open_files>
@@ -18,13 +22,13 @@
 			<path>src\TextToColourRead.java</path>
 			<source>true</source>
 			<index>0</index>
-			<active>true</active>
+			<active>false</active>
 		</docitem>
 		<docitem>
 			<path>src\TextToColourWrite.java</path>
 			<source>true</source>
 			<index>1</index>
-			<active>false</active>
+			<active>true</active>
 		</docitem>
 		<docitem>
 			<path>src\charMap.java</path>

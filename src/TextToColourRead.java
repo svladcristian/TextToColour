@@ -32,11 +32,101 @@ class positionCoordinates {
 	}
 }
 
+class encodedImage {
+	BufferedImage image;
+	int ni, nj;
+	encodedImage(int j, int i) {
+		ni = i; nj = j;
+		image = new BufferedImage(nj, ni, BufferedImage.TYPE_INT_RGB);
+	}
+		
+	void encode(positionCoordinates pos, int red, int green, int blue) {
+		// permutations: rgb rbg grb gbr brg bgr
+		switch (pos.getPerm()) {
+			case 0: {
+				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((red << 16) | (green << 8) | blue));
+				pos.increment();
+			}break;
+			case 1: {
+				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((red << 16) | (blue << 8) | green));
+				pos.increment();
+			}break;
+			case 2: {
+				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((green << 16) | (red << 8) | blue));
+				pos.increment();
+			}break;
+			case 3: {
+				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((green << 16) | (blue << 8) | red));
+				pos.increment();
+			}break;
+			case 4: {
+				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((blue << 16) | (red << 8) | green));
+				pos.increment();
+			}break;
+			case 5: {
+				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((blue << 16) | (green << 8) | red));
+				pos.resetPerm();
+			}break;
+			default: {
+				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((red << 16) | (green << 8) | blue));	
+			}break;
+		}
+	}
+}
+
+class pixelBuild extends Thread {
+	String text;
+	int start, end;
+	ArrayList<Character> allChars;
+	int intervalSpan;
+	encodedImage image;
+	int ni, nj;
+	positionCoordinates pos;
+	pixelBuild(String txt, int strt, int ed, ArrayList<Character> allChrs, int intvlSpn, encodedImage img, int i, int j, positionCoordinates ps) {
+		text = txt;
+		start = strt; end = ed;
+		allChars = allChrs;
+		intervalSpan = intvlSpn;
+		image = img;
+		ni = i; nj = j;
+		pos = ps;
+	}
+	public void run() {
+		Random rand = new Random();
+		int range, randNum;
+		for (int i = start; i+2 <= end; i += 3) {
+			//int red = (int) text.charAt(i);
+			//int green = (int) text.charAt(i+1);
+			//int blue = (int) text.charAt(i+2);
+			
+			// character mapping
+			int red = allChars.indexOf(text.charAt(i));
+			range = ((((red + 1) * intervalSpan) - 1) - (red * intervalSpan))  + 1;
+			randNum =  rand.nextInt(range) + (red * intervalSpan);
+			red = randNum;
+			
+			int green = allChars.indexOf(text.charAt(i+1));
+			range = (((green + 1) * intervalSpan) - 1) - (green * intervalSpan)  + 1;
+			randNum =  rand.nextInt(range) + (green * intervalSpan);
+			green = randNum;
+			
+			int blue = allChars.indexOf(text.charAt(i+2));
+			range = (((blue + 1) * intervalSpan) - 1) - (blue * intervalSpan)  + 1;
+			randNum =  rand.nextInt(range) + (blue * intervalSpan);
+			blue = randNum;
+			
+			System.out.print("[ " + red + " " + green + " " + blue + " ] ");
+			image.encode(pos, red, green, blue);
+			//np++;
+		}
+	}
+}
+
 public class TextToColourRead {
 	String text;
 	ArrayList<Character> allChars;
 	int intervalSpan;
-	BufferedImage image;
+	encodedImage image;
 	int n, m, roundm, ni, nj;
 	public TextToColourRead(String INPUTFILENAME) {
 		// Reading text from file.
@@ -131,64 +221,62 @@ public class TextToColourRead {
 		// with at most 2 rgb value fillers, to complete the last pixel.
 		// - roundm reached
 		// Creating image
-		image = new BufferedImage(nj, ni, BufferedImage.TYPE_INT_RGB);
+		image = new encodedImage(nj, ni);
 		// int np = 0;
 		int i;
-		positionCoordinates pos = new positionCoordinates(0,0);
+		//positionCoordinates pos = new positionCoordinates(0,0);
 		//intWrapper perm = new intWrapper(0);
+		
+		int li, lj;
+		Thread[] threads = new Thread[3];
+		li = 0; lj = ((((m / 3) / 3) * 3) - 1);
+		System.out.println(li + " - " + lj);
+		threads[0] = new pixelBuild(text,li,lj,allChars,intervalSpan,image,ni,nj,new positionCoordinates(0,0));
+		threads[0].start();
+		
+		li = lj + 1;
+		lj += ((((m / 3) / 3) * 3));
+		System.out.println(li + " - " + lj);
+		threads[1] = new pixelBuild(text,li,lj,allChars,intervalSpan,image,ni,nj,new positionCoordinates(((li / 3) % 6),(li / 3)));
+		threads[1].start();
+		
+		li = lj + 1;
+		lj = ((m - (m % 3)) - 1 );
+		System.out.println(li + " - " + lj);
+		threads[2] = new pixelBuild(text,li,lj,allChars,intervalSpan,image,ni,nj,new positionCoordinates(((li / 3) % 6),(li / 3)));
+		threads[2].start();
+		
 		Random rand = new Random();
 		int range, randNum;
-		for (i = 0; i+3 <= m; i += 3) {
-			//int red = (int) text.charAt(i);
-			//int green = (int) text.charAt(i+1);
-			//int blue = (int) text.charAt(i+2);
-			
-			// character mapping
-			int red = allChars.indexOf(text.charAt(i));
-			range = ((((red + 1) *intervalSpan) - 1) - (red *intervalSpan))  + 1;
-			randNum =  rand.nextInt(range) + (red *intervalSpan);
-			red = randNum;
-			
-			int green = allChars.indexOf(text.charAt(i+1));
-			range = (((green + 1) *intervalSpan) - 1) - (green *intervalSpan)  + 1;
-			randNum =  rand.nextInt(range) + (green *intervalSpan);
-			green = randNum;
-			
-			int blue = allChars.indexOf(text.charAt(i+2));
-			range = (((blue + 1) *intervalSpan) - 1) - (blue *intervalSpan)  + 1;
-			randNum =  rand.nextInt(range) + (blue *intervalSpan);
-			blue = randNum;
-			
-			System.out.print("[ " + red + " " + green + " " + blue + " ] ");
-			setRGBPermute(pos, red, green, blue);
-			//np++;
-		}
+		i = lj + 1;
+		positionCoordinates pos = new positionCoordinates(((i / 3) % 6),(i / 3));
+		System.out.println("i=" + i);
 		if (m - i > 0) {
 			//int red = (int) text.charAt(i);
 			int red = allChars.indexOf(text.charAt(i));
-			range = (((red + 1) *intervalSpan) - 1) - (red *intervalSpan)  + 1;
-			randNum =  rand.nextInt(range) + (red *intervalSpan);
+			range = (((red + 1) * intervalSpan) - 1) - (red * intervalSpan)  + 1;
+			randNum =  rand.nextInt(range) + (red * intervalSpan);
 			red = randNum;
 			
 			int green;
 			if (m - i > 1) {
 				green = allChars.indexOf(text.charAt(i+1));
-				range = (((green + 1) *intervalSpan) - 1) - (green *intervalSpan)  + 1;
-				randNum =  rand.nextInt(range) + (green *intervalSpan);
+				range = (((green + 1) * intervalSpan) - 1) - (green * intervalSpan)  + 1;
+				randNum =  rand.nextInt(range) + (green * intervalSpan);
 				green = randNum;
 			}
 			else {
 				green = allChars.indexOf('\0');
-				range = ((((green + 1) *intervalSpan) - 1) - (green *intervalSpan))  + 1;
-				randNum =  rand.nextInt(range) + (green *intervalSpan);
+				range = ((((green + 1) * intervalSpan) - 1) - (green * intervalSpan))  + 1;
+				randNum =  rand.nextInt(range) + (green * intervalSpan);
 				green = randNum;
 			}
 			int blue = allChars.indexOf('\0');
-			range = ((((blue + 1) *intervalSpan) - 1) - (blue *intervalSpan))  + 1;
-			randNum =  rand.nextInt(range) + (blue *intervalSpan);
+			range = ((((blue + 1) * intervalSpan) - 1) - (blue * intervalSpan))  + 1;
+			randNum =  rand.nextInt(range) + (blue * intervalSpan);
 			blue = randNum;
 			System.out.println("*[ " + red + " " + green + " " + blue + " ]* ");
-			setRGBPermute(pos, red, green, blue);
+			image.encode(pos, red, green, blue);
 			//np++;
 		}
 		System.out.println();
@@ -198,67 +286,42 @@ public class TextToColourRead {
 		// - n reached
 		for (i = roundm; i < n; i++) {
 			int red = allChars.indexOf('\0');
-			range = ((((red + 1) *intervalSpan) - 1) - (red *intervalSpan))  + 1;
-			randNum =  rand.nextInt(range) + (red *intervalSpan);
+			range = ((((red + 1) * intervalSpan) - 1) - (red * intervalSpan))  + 1;
+			randNum =  rand.nextInt(range) + (red * intervalSpan);
 			red = randNum;
 			
 			int green = allChars.indexOf('\0');
-			range = ((((green + 1) *intervalSpan) - 1) - (green *intervalSpan))  + 1;
-			randNum =  rand.nextInt(range) + (green *intervalSpan);
+			range = ((((green + 1) * intervalSpan) - 1) - (green * intervalSpan))  + 1;
+			randNum =  rand.nextInt(range) + (green * intervalSpan);
 			green = randNum;
 			
 			int blue = allChars.indexOf('\0');
-			range = ((((blue + 1) *intervalSpan) - 1) - (blue *intervalSpan))  + 1;
-			randNum =  rand.nextInt(range) + (blue *intervalSpan);
+			range = ((((blue + 1) * intervalSpan) - 1) - (blue * intervalSpan))  + 1;
+			randNum =  rand.nextInt(range) + (blue * intervalSpan);
 			blue = randNum;
 			
 			System.out.print("**[ " + red + " " + green + " " + blue + " ]** ");
-			setRGBPermute(pos, red, green, blue);
+			image.encode(pos, red, green, blue);
 			//np++;
 		}
 		System.out.println();
 		System.out.println("Number of pixels obtained: " + pos.getPixelCount() + " - " + "Number of pixels expected: " + n);
 		
-		writeImage();
-	}
-	
-	void setRGBPermute(positionCoordinates pos, int red, int green, int blue) {
-		// permutations: rgb rbg grb gbr brg bgr
-		switch (pos.getPerm()) {
-			case 0: {
-				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((red << 16) | (green << 8) | blue));
-				pos.increment();
-			}break;
-			case 1: {
-				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((red << 16) | (blue << 8) | green));
-				pos.increment();
-			}break;
-			case 2: {
-				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((green << 16) | (red << 8) | blue));
-				pos.increment();
-			}break;
-			case 3: {
-				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((green << 16) | (blue << 8) | red));
-				pos.increment();
-			}break;
-			case 4: {
-				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((blue << 16) | (red << 8) | green));
-				pos.increment();
-			}break;
-			case 5: {
-				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((blue << 16) | (green << 8) | red));
-				pos.resetPerm();
-			}break;
-			default: {
-				image.setRGB(pos.getPixelCount()/ni, pos.getPixelCount()%ni, ((red << 16) | (green << 8) | blue));	
-			}break;
+		try {
+			threads[0].join();
+			threads[1].join();
+			threads[2].join();
+		}catch(InterruptedException e) {
+			e.printStackTrace();
 		}
+		
+		writeImage();
 	}
 	
 	void writeImage() {
 		// Writing resulting image.
 		try {
-			ImageIO.write(image, "PNG", new File("image.png"));
+			ImageIO.write(image.image, "PNG", new File("image.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

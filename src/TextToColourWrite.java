@@ -111,7 +111,8 @@ public class TextToColourWrite {
 		}
 		String text;
 		text = stringBuilder.toString();
-		text = text.trim();
+		// text = text.trim();
+		text = text.replaceAll("\0", ""); 
 		System.out.println(text);
 		System.out.println("size of text = " + text.length());
 		

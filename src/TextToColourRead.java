@@ -115,7 +115,7 @@ class pixelBuild extends Thread {
 			randNum =  rand.nextInt(range) + (blue * intervalSpan);
 			blue = randNum;
 			
-			System.out.print("[ " + red + " " + green + " " + blue + " ] ");
+			// System.out.print("[ " + red + " " + green + " " + blue + " ] ");
 			image.encode(pos, red, green, blue);
 			//np++;
 		}
@@ -213,6 +213,15 @@ public class TextToColourRead {
 		n = ni*nj;
 		System.out.println("n=" + n + "=" + ni + "*" + nj);
 		
+		StringBuffer sb = new StringBuffer(text);
+		Random rand = new Random();
+		for (int i = 0; i < ((n * 3) - m); i++) {
+			int x =  rand.nextInt(sb.length());
+			sb.insert(x, '\0');
+		}
+		text = sb.toString();
+		System.out.println(text.length());
+		
 		buildImage();
 	}
 	
@@ -223,12 +232,27 @@ public class TextToColourRead {
 		// Creating image
 		image = new encodedImage(nj, ni);
 		// int np = 0;
-		int i;
+		// int i;
 		//positionCoordinates pos = new positionCoordinates(0,0);
 		//intWrapper perm = new intWrapper(0);
 		
-		int li, lj;
-		Thread[] threads = new Thread[3];
+		int li = 0, lj;
+		Thread[] threads = new Thread[10];
+		int k = (n / 10);
+		if (k > 0) {
+			lj = ((k * 3) - 1);
+			for (int i = 0; i < 10; i++) {
+				System.out.println(li + " - " + lj);
+				threads[i] = new pixelBuild(text,li,lj,allChars,intervalSpan,image,ni,nj,new positionCoordinates(((li / 3) % 6),(li / 3)));
+				threads[i].start();
+				
+				li = lj + 1;
+				lj = lj + (3 * k);
+			}	
+		}
+		
+		
+		/*
 		li = 0; lj = ((((m / 3) / 3) * 3) - 1);
 		System.out.println(li + " - " + lj);
 		threads[0] = new pixelBuild(text,li,lj,allChars,intervalSpan,image,ni,nj,new positionCoordinates(0,0));
@@ -281,9 +305,34 @@ public class TextToColourRead {
 		}
 		System.out.println();
 		System.out.println("Number of pixels obtained: " + pos.getPixelCount() + " - " + "Number of pixels expected: " + roundm);
-			
+		*/
+		
 		// Filling remaining pixels to completion.
 		// - n reached
+		System.out.println(li + " -> " + (n * 3));
+		positionCoordinates pos = new positionCoordinates(((li / 3) % 6),(li / 3));
+		Random rand = new Random();
+		int range, randNum;
+		for (int i = li; i+2 <= (n * 3); i += 3) {
+			int red = allChars.indexOf(text.charAt(i));
+			range = ((((red + 1) * intervalSpan) - 1) - (red * intervalSpan))  + 1;
+			randNum =  rand.nextInt(range) + (red * intervalSpan);
+			red = randNum;
+			
+			int green = allChars.indexOf(text.charAt(i+1));
+			range = (((green + 1) * intervalSpan) - 1) - (green * intervalSpan)  + 1;
+			randNum =  rand.nextInt(range) + (green * intervalSpan);
+			green = randNum;
+			
+			int blue = allChars.indexOf(text.charAt(i+2));
+			range = (((blue + 1) * intervalSpan) - 1) - (blue * intervalSpan)  + 1;
+			randNum =  rand.nextInt(range) + (blue * intervalSpan);
+			blue = randNum;
+			
+			// System.out.print("[ " + red + " " + green + " " + blue + " ] ");
+			image.encode(pos, red, green, blue);
+		}
+		/*
 		for (i = roundm; i < n; i++) {
 			int red = allChars.indexOf('\0');
 			range = ((((red + 1) * intervalSpan) - 1) - (red * intervalSpan))  + 1;
@@ -304,13 +353,14 @@ public class TextToColourRead {
 			image.encode(pos, red, green, blue);
 			//np++;
 		}
+		*/
 		System.out.println();
 		System.out.println("Number of pixels obtained: " + pos.getPixelCount() + " - " + "Number of pixels expected: " + n);
 		
 		try {
-			threads[0].join();
-			threads[1].join();
-			threads[2].join();
+			for (int i = 0; i < 10; i++) {
+				threads[i].join();
+			}
 		}catch(InterruptedException e) {
 			e.printStackTrace();
 		}
